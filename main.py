@@ -56,14 +56,18 @@ if not "initialized" in st.session_state:
 ############################################################
 # 4. 初期表示
 ############################################################
+# サイドバーの表示
+cn.display_sidebar()
+
+# メイン画面の表示
 # タイトル表示
 cn.display_app_title()
 
-# モード表示
-cn.display_select_mode()
+# ユーザーへの自己紹介
+cn.display_main_introduction()
 
-# AIメッセージの初期表示
-cn.display_initial_ai_message()
+# ユーザーへの注記
+cn.display_user_notice()
 
 
 ############################################################

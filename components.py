@@ -14,6 +14,35 @@ import constants as ct
 # 関数定義
 ############################################################
 
+def display_sidebar():
+    """
+    サイドバーの表示
+    """
+    with st.sidebar:
+        st.markdown("### 利用目的")
+        
+        # 利用目的の選択
+        st.session_state.mode = st.radio(
+            label="利用目的を選択してください",
+            options=[ct.ANSWER_MODE_1, ct.ANSWER_MODE_2],
+            key="mode_selector"
+        )
+        
+        st.markdown("---")
+        
+        # 選択されたモードに応じて説明と入力例を表示
+        if st.session_state.mode == ct.ANSWER_MODE_1:
+            st.markdown(f"#### {ct.ANSWER_MODE_1}")
+            st.info("入力内容と関連性が高い社内文書のありかを検索できます。")
+            st.markdown("**入力例:**")
+            st.code("社員の育成方針に関するMTGの議事録", language=None)
+        else:
+            st.markdown(f"#### {ct.ANSWER_MODE_2}")
+            st.info("質問・要望に対して、社内文書の情報をもとに回答を得られます。")
+            st.markdown("**入力例:**")
+            st.code("人事部に所属している従業員情報を一覧化して", language=None)
+
+
 def display_app_title():
     """
     タイトル表示
@@ -36,9 +65,24 @@ def display_select_mode():
         )
 
 
+def display_main_introduction():
+    """
+    メイン画面でのユーザーへの自己紹介
+    """
+    with st.chat_message("assistant"):
+        st.markdown("こんにちは。私は社内文書の情報をもとに回答する生成AIチャットボットです。左のサイドバーで利用目的を選択し、下部のチャット欄からメッセージを送信してください。")
+
+
+def display_user_notice():
+    """
+    ユーザーへの注記
+    """
+    st.info("💡 **より良い回答を得るために**: 具体的なキーワードや詳細な質問内容を入力することで、より適切な社内文書を見つけることができます。")
+
+
 def display_initial_ai_message():
     """
-    AIメッセージの初期表示
+    AIメッセージの初期表示（従来版・後方互換性のため残す）
     """
     with st.chat_message("assistant"):
         # 「st.success()」とすると緑枠で表示される
@@ -88,7 +132,7 @@ def display_conversation_log():
                         icon = utils.get_source_icon(message['content']['main_file_path'])
                         # 参照元ドキュメントのページ番号が取得できた場合にのみ、ページ番号を表示
                         if "main_page_number" in message["content"]:
-                            st.success(f"{message['content']['main_file_path']}", icon=icon)
+                            st.success(f"{message['content']['main_file_path']} (ページNO.{message['content']['main_page_number']})", icon=icon)
                         else:
                             st.success(f"{message['content']['main_file_path']}", icon=icon)
                         
@@ -105,7 +149,7 @@ def display_conversation_log():
                                 icon = utils.get_source_icon(sub_choice['source'])
                                 # 参照元ドキュメントのページ番号が取得できた場合にのみ、ページ番号を表示
                                 if "page_number" in sub_choice:
-                                    st.info(f"{sub_choice['source']}", icon=icon)
+                                    st.info(f"{sub_choice['source']} (ページNO.{sub_choice['page_number']})", icon=icon)
                                 else:
                                     st.info(f"{sub_choice['source']}", icon=icon)
                     # ファイルのありかの情報が取得できなかった場合、LLMからの回答のみ表示
@@ -160,7 +204,7 @@ def display_search_llm_response(llm_response):
             # ページ番号を取得
             main_page_number = llm_response["context"][0].metadata["page"]
             # 「メインドキュメントのファイルパス」と「ページ番号」を表示
-            st.success(f"{main_file_path}", icon=icon)
+            st.success(f"{main_file_path} (ページNO.{main_page_number})", icon=icon)
         else:
             # 「メインドキュメントのファイルパス」を表示
             st.success(f"{main_file_path}", icon=icon)
@@ -216,7 +260,7 @@ def display_search_llm_response(llm_response):
                 # ページ番号が取得できない場合のための分岐処理
                 if "page_number" in sub_choice:
                     # 「サブドキュメントのファイルパス」と「ページ番号」を表示
-                    st.info(f"{sub_choice['source']}", icon=icon)
+                    st.info(f"{sub_choice['source']} (ページNO.{sub_choice['page_number']})", icon=icon)
                 else:
                     # 「サブドキュメントのファイルパス」を表示
                     st.info(f"{sub_choice['source']}", icon=icon)
@@ -296,7 +340,7 @@ def display_contact_llm_response(llm_response):
                 # ページ番号を取得
                 page_number = document.metadata["page"]
                 # 「ファイルパス」と「ページ番号」
-                file_info = f"{file_path}"
+                file_info = f"{file_path} (ページNO.{page_number})"
             else:
                 # 「ファイルパス」のみ
                 file_info = f"{file_path}"

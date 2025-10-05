@@ -56,6 +56,10 @@ WEB_URL_LOAD_TARGETS = [
     "https://generative-ai.web-camp.io/"
 ]
 
+# テキスト分割設定
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 50
+
 
 # ==========================================
 # プロンプトテンプレート
